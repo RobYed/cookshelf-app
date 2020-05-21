@@ -1,0 +1,337 @@
+openapi: 3.0.1
+info:
+  title: Cookshelf API
+  description: 'This is the API documentation for the Cookshelf recipes app'
+  termsOfService: https://github.com/RobYed
+  contact:
+    email: doesnotexist@cookshelf.com
+  license:
+    name: MIT
+    url: https://github.com/RobYed/cookshelf-app/blob/master/LICENSE
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Cookshelf
+  url: https://cookshelf.com
+servers:
+- url: https://cookshelf.com/api/v1
+tags:
+- name: recipe
+  description: A generic description of a single recipe
+  externalDocs:
+    description: Find out more
+    url: https://cookshelf.com
+paths:
+  /recipe:
+    put:
+      tags:
+      - recipe
+      summary: Update an existing recipe
+      operationId: updateRecipe
+      requestBody:
+        description: Recipe object that needs to be added to the cookshelf
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+        required: true
+      responses:
+        200:
+          description: Recipe successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Recipe not found
+          content: {}
+        405:
+          description: Validation exception
+          content: {}
+      security:
+      - cookshelf_auth:
+        - write:recipes
+        - read:recipes
+      x-codegen-request-body-name: body
+    post:
+      tags:
+      - recipe
+      summary: Add a new recipe to the cookshelf
+      operationId: createRecipe
+      requestBody:
+        description: Recipe object that needs to be added to the cookshelf
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Recipe'
+        required: true
+      responses:
+        201:
+          description: Recipe successfully created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        405:
+          description: Invalid input
+          content: {}
+      security:
+      - cookshelf_auth:
+        - write:recipes
+        - read:recipes
+      x-codegen-request-body-name: body
+    get:
+      tags:
+      - recipe
+      summary: Get a list of recipes
+      description: Filter by name or tags
+      operationId: getRecipes
+      parameters:
+      - name: name
+        in: query
+        description: Name to filter by
+        required: false
+        schema:
+          type: string
+      - name: tags
+        in: query
+        description: Tags to filter by
+        required: false
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        200:
+          description: recipes found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Recipe'
+        204:
+          description: no recipe found
+          content:
+            application/json:
+              schema:
+                type: array
+                description: empty array
+                items:
+                 $ref: '#/components/schemas/Recipe'
+        400:
+          description: Invalid tag value
+          content: {}
+      security:
+      - cookshelf_auth:
+        - read:recipes
+  /recipe/{recipeId}:
+    get:
+      tags:
+      - recipe
+      summary: Find recipe by ID
+      description: Returns a single recipe
+      operationId: getRecipeById
+      parameters:
+      - name: recipeId
+        in: path
+        description: ID of recipe to return
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Recipe'
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Recipe not found
+          content: {}
+      security:
+      - api_key: []
+    delete:
+      tags:
+      - recipe
+      summary: Deletes a recipe
+      operationId: deleteRecipe
+      parameters:
+      - name: recipeId
+        in: path
+        description: Recipe id to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        204:
+          description: recipe successfully deleted
+        400:
+          description: Invalid ID supplied
+          content: {}
+        404:
+          description: Recipe not found
+          content: {}
+      security:
+      - cookshelf_auth:
+        - write:recipes
+        - read:recipes
+  /recipe/{recipeId}/image:
+    post:
+      tags:
+      - recipe
+      summary: uploads an image to a specific recipe
+      operationId: uploadImage
+      parameters:
+      - name: recipeId
+        in: path
+        description: ID of recipe to update
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                additionalMetadata:
+                  type: string
+                  description: Additional data to pass to server
+                file:
+                  type: string
+                  description: file to upload
+                  format: binary
+      responses:
+        200:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+      security:
+      - cookshelf_auth:
+        - write:recipes
+        - read:recipes
+
+components:
+  schemas:
+    UnitOfMeasurement:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: gram
+    Ingredient:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        amount:
+          type: number
+          format: float
+          example: 250
+        unit:
+          $ref: '#/components/schemas/UnitOfMeasurement'
+        name:
+          type: string
+          example: spaghetti
+    Tag:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: vegetarian
+    Recipe:
+      required:
+      - name
+      - ingredients
+      - instructions
+      - status
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+          example: Spaghetti Carbonara
+        description:
+          type: string
+          example: Best Carbonara in the world
+        ingredients:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/Ingredient'
+        instructions:
+          type: array
+          minItems: 1
+          items:
+            type: string
+        imageUrls:
+          type: array
+          items:
+            type: string
+        tags:
+          type: array
+          uniqueItems: true
+          items:
+            $ref: '#/components/schemas/Tag'
+        note:
+          type: string
+          example: You might also try linguins instead of spaghetti
+        status:
+          type: string
+          description: recipe status in the cookshelf
+          enum:
+          - DRAFT
+          - FINAL
+          - DELETED
+        originalSource:
+          type: string
+          description: where the recipe was originally taken from (e.g. URL, ISBN, name)
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    cookshelf_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://petstore.swagger.io/oauth/dialog
+          scopes:
+            write:pets: modify recipes in your account
+            read:pets: read your recipes
+    api_key:
+      type: apiKey
+      name: api_key
+      in: header
