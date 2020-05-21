@@ -188,8 +188,8 @@ paths:
     post:
       tags:
       - recipe
-      summary: uploads an image to a specific recipe
-      operationId: uploadImage
+      summary: Saves an image to a specific recipe
+      operationId: saveImage
       parameters:
       - name: recipeId
         in: path

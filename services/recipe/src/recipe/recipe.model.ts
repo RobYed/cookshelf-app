@@ -1,7 +1,9 @@
 import { Id } from '../common/typed-id';
 
+export type RecipeId = Id<Recipe>;
+
 export interface Recipe {
-  id: Id<Recipe>;
+  id: RecipeId;
   name: string;
   description: string;
   ingredients: Ingredient[];
@@ -15,19 +17,25 @@ export interface Recipe {
 
 export type RecipeStatus = 'DRAFT' | 'FINAL' | 'DELETED';
 
+export type IngredientId = Id<Ingredient>;
+
 export interface Ingredient {
-  id: Id<Ingredient>;
+  id: IngredientId;
   amount: number;
   unit: UnitOfMeasurement;
   name: string;
 }
 
+export type UnitOfMeasurementId = Id<UnitOfMeasurement>;
+
 export interface UnitOfMeasurement {
-  id: Id<UnitOfMeasurement>;
+  id: UnitOfMeasurementId;
   name: string;
 }
 
+export type TagId = Id<Tag>;
+
 export interface Tag {
-  id: Id<Tag>;
+  id: TagId;
   name: string;
 }
