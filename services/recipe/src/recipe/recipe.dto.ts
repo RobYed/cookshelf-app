@@ -1,41 +1,77 @@
 import { Id } from '../common/typed-id';
+import { ApiProperty } from '@nestjs/swagger';
 
 export type RecipeId = Id<RecipeDto>;
-
-export class RecipeDto {
-  id!: RecipeId;
-  name!: string;
-  description!: string;
-  ingredients!: IngredientDto[];
-  instructions!: string[];
-  imageUrls!: string[];
-  tags!: TagDto[];
-  status!: RecipeStatus;
-  note?: string;
-  originalSource?: string;
-}
+export type UnitOfMeasurementId = Id<UnitOfMeasurementDto>;
+export type TagId = Id<TagDto>;
 
 export type RecipeStatus = 'DRAFT' | 'FINAL' | 'DELETED';
 
-export type IngredientId = Id<IngredientDto>;
+export class UnitOfMeasurementDto {
+  @ApiProperty({ type: Number })
+  id!: UnitOfMeasurementId;
+
+  @ApiProperty({ example: 'gram' })
+  name!: string;
+}
 
 export class IngredientDto {
-  id!: IngredientId;
+  @ApiProperty({ example: 250 })
   amount!: number;
+
+  @ApiProperty({ type: UnitOfMeasurementDto })
   unit!: UnitOfMeasurementDto;
+
+  @ApiProperty({ example: 'Spaghetti' })
   name!: string;
 }
-
-export type UnitOfMeasurementId = Id<UnitOfMeasurementDto>;
-
-export class UnitOfMeasurementDto {
-  id!: UnitOfMeasurementId;
-  name!: string;
-}
-
-export type TagId = Id<TagDto>;
 
 export class TagDto {
+  @ApiProperty({ type: Number })
   id!: TagId;
+
+  @ApiProperty({ example: 'italian' })
   name!: string;
+}
+
+export class RecipeDto {
+  @ApiProperty({
+    type: Number,
+    description: 'Recipe Identifier. Will be set when saved',
+  })
+  id?: RecipeId;
+
+  @ApiProperty({ example: 'Spaghetti Aglio e Olio' })
+  name!: string;
+
+  @ApiProperty({ example: 'Fast, healthy and delicious meal' })
+  description!: string;
+
+  @ApiProperty({ type: [IngredientDto], minimum: 1 })
+  ingredients!: IngredientDto[];
+
+  @ApiProperty({ minimum: 1, example: ['Cook spaghetti in the boiling water'] })
+  instructions!: string[];
+
+  @ApiProperty({
+    example: 'https://images.unsplash.com/photo-1552056776-9b5657118ca4',
+  })
+  imageUrls!: string[];
+
+  @ApiProperty({ type: [TagDto], example: ['italian', 'vegetarian'] })
+  tags!: TagDto[];
+
+  @ApiProperty({ enum: ['DRAFT', 'FINAL', 'DELETED'] })
+  status!: RecipeStatus;
+
+  @ApiProperty({
+    example:
+      'Add some fresh tomato while cooking to have some light and tasty sauce',
+  })
+  note?: string;
+
+  @ApiProperty({
+    example: 'https://www.allrecipes.com/recipe/222000/spaghetti-aglio-e-olio/',
+  })
+  originalSource?: string;
 }

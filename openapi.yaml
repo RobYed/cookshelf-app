@@ -48,7 +48,7 @@ paths:
           description: Recipe not found
           content: {}
         405:
-          description: Validation exception
+          description: Invalid input
           content: {}
       security:
       - cookshelf_auth:
@@ -123,7 +123,7 @@ paths:
                 items:
                  $ref: '#/components/schemas/Recipe'
         400:
-          description: Invalid tag value
+          description: Invalid tag or name value
           content: {}
       security:
       - cookshelf_auth:
@@ -150,9 +150,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Recipe'
-        400:
-          description: Invalid ID supplied
-          content: {}
         404:
           description: Recipe not found
           content: {}
@@ -173,10 +170,7 @@ paths:
           format: int64
       responses:
         204:
-          description: recipe successfully deleted
-        400:
-          description: Invalid ID supplied
-          content: {}
+          description: recipe successfully DELETED
         404:
           description: Recipe not found
           content: {}

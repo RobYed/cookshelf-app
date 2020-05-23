@@ -14,7 +14,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { RecipeDto, RecipeId } from './recipe.dto';
 import { RecipeService } from './recipe.service';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiNoContentResponse } from '@nestjs/swagger';
 
 @ApiTags('recipe')
 @Controller('recipe')
@@ -27,6 +27,10 @@ export class RecipeController {
    * @param recipe Recipe object that needs to be updated
    */
   @Put()
+  @ApiOperation({ summary: 'Update an existing recipe' })
+  @ApiOkResponse({ description: 'Recipe successfully updated', type: RecipeDto })
+  @ApiBadRequestResponse({ description: 'Invalid recipe or missing id' })
+  @ApiNotFoundResponse({ description: 'Recipe not found' })
   updateRecipe(@Body() recipe: RecipeDto): RecipeDto {
     return this.recipeService.updateRecipe(recipe);
   }
@@ -38,17 +42,24 @@ export class RecipeController {
    */
   @Post()
   @HttpCode(201)
+  @ApiOperation({ summary: 'Add a new recipe to the cookshelf' })
+  @ApiCreatedResponse({ description: 'Recipe successfully created', type: RecipeDto })
+  @ApiBadRequestResponse({ description: 'Invalid recipe' })
   createRecipe(@Body() recipe: RecipeDto): RecipeDto {
     return this.recipeService.createRecipe(recipe);
   }
 
   /**
-   * Get a list of recipes. Filter by name or tags.
+   * Get a list of recipes optionally filtered by name or tags
    *
    * @param name Name to filter by
    * @param tags One or more tags to filter by
    */
   @Get()
+  @ApiOperation({ summary: 'Get a list of recipes optionally filtered by name or tags' })
+  @ApiOkResponse({ description: 'Recipe(s) found', type: [RecipeDto] })
+  @ApiNoContentResponse({ description: 'No recipe found' })
+  @ApiBadRequestResponse({ description: 'Invalid parameter value(s)'})
   getRecipes(
     @Query('name') name?: string,
     @Query('tags') tags?: string | string[],
@@ -57,33 +68,43 @@ export class RecipeController {
   }
 
   /**
-   * Find recipe by ID. Returns a single recipe.
+   * Find recipe by ID. Returns a single recipe
    *
    * @param recipeId ID of recipe to return
    */
   @Get(':recipeId')
+  @ApiOperation({ summary: 'Find recipe by ID. Returns a single recipe' })
+  @ApiOkResponse({ description: 'Recipe found' })
+  @ApiNotFoundResponse({ description: 'Recipe not found' })
   getRecipeById(@Param('recipeId') recipeId: RecipeId): RecipeDto | null {
     return this.recipeService.getRecipeById(recipeId);
   }
 
   /**
-   * Deletes a recipe
+   * Delete a recipe
    *
    * @param recipeId Recipe id to delete
    */
   @Delete(':recipeId')
   @HttpCode(204)
+  @ApiOperation({ summary: 'Delete a recipe' })
+  @ApiResponse({ status: 204, description: 'Recipe successfully deleted' })
+  @ApiNotFoundResponse({ description: 'Recipe not found' })
   deleteRecipe(@Param('recipeId') recipeId: RecipeId): void {
     this.recipeService.deleteRecipe(recipeId);
   }
 
   /**
-   * Saves an image to a specific recipe
+   * Save an image to a specific recipe
    *
    * @param recipeId ID of recipe to update
    */
   @Post(':recipeId/image')
+  @HttpCode(201)
   @UseInterceptors(FileInterceptor('file'))
+  @ApiOperation({ summary: 'Save an image to a specific recipe' })
+  @ApiCreatedResponse({ description: 'Image successfully saved'})
+  @ApiBadRequestResponse({ description: 'The image file is malformed' })
   saveImage(
     @Param('recipeId') recipeId: RecipeId,
     @UploadedFile() image: Express.Multer.File,
