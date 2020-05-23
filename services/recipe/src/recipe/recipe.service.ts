@@ -10,6 +10,12 @@ export class RecipeService {
   }
 
   updateRecipe(recipe: RecipeDto): RecipeDto {
+    if (!recipe.id) {
+      throw new Error('No id supplied');
+    }
+    if (!this.recipes.has(recipe.id)) {
+      throw new Error('Recipe not found');
+    }
     this.recipes.set(recipe.id, recipe);
     return recipe;
   }
@@ -60,14 +66,13 @@ export class RecipeService {
       description: 'Fast, healthy and delicious',
       ingredients: [
         {
-          id: 1,
-          amount: 1,
-          unit: { id: 1, name: 'pound' },
+          amount: 250,
+          unit: { id: 1, name: 'gram' },
           name: 'spaghetti',
         },
       ],
       instructions: [],
-      imageUrls: [],
+      imageUrls: ['https://images.unsplash.com/photo-1552056776-9b5657118ca4'],
       tags: [{ id: 1, name: 'Italian ' }],
       note:
         'Add some fresh tomato while cooking to have some light and tasty sauce',
