@@ -180,7 +180,7 @@ describe('Recipe Controller', () => {
     });
   });
 
-  function createRecipe(id = 1234): RecipeDto {
+  function createRecipe(id = '1234'): RecipeDto {
     return {
       id,
       name: 'Spaghetti Aglio e Olio',
@@ -188,7 +188,7 @@ describe('Recipe Controller', () => {
       ingredients: [
         {
           amount: 1,
-          unit: { id: 1, name: 'pound' },
+          unit: 'pound',
           name: 'spaghetti',
         },
       ],

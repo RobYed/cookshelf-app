@@ -1,33 +1,31 @@
-import { Id } from '../common/typed-id';
 import { ApiProperty } from '@nestjs/swagger';
+import { Recipe, Ingredient, RecipeId } from './recipe.entity';
 
-export type RecipeId = Id<RecipeDto>;
-export type UnitOfMeasurementId = Id<UnitOfMeasurementDto>;
+export type RecipeStatusDto = 'DRAFT' | 'FINAL' | 'DELETED';
 
-export type RecipeStatus = 'DRAFT' | 'FINAL' | 'DELETED';
-
-export class UnitOfMeasurementDto {
-  @ApiProperty({ type: Number })
-  id!: UnitOfMeasurementId;
-
-  @ApiProperty({ example: 'gram' })
-  name!: string;
-}
 
 export class IngredientDto {
   @ApiProperty({ example: 250 })
   amount!: number;
 
-  @ApiProperty({ type: UnitOfMeasurementDto })
-  unit!: UnitOfMeasurementDto;
+  @ApiProperty({ example: 'gram' })
+  unit!: string;
 
   @ApiProperty({ example: 'Spaghetti' })
   name!: string;
+
+  static build(ingredient: Ingredient): IngredientDto {
+    const instance = new IngredientDto();
+    instance.amount = ingredient.amount;
+    instance.unit = ingredient.unit.name;
+    instance.name = ingredient.name;
+    return instance;
+  }
 }
 
 export class RecipeDto {
   @ApiProperty({
-    type: Number,
+    type: String,
     description: 'Recipe Identifier. Will be set when saved',
   })
   id?: RecipeId;
@@ -39,7 +37,7 @@ export class RecipeDto {
   description!: string;
 
   @ApiProperty({ type: [IngredientDto], minimum: 1 })
-  ingredients!: IngredientDto[];
+  ingredients: IngredientDto[] = [];
 
   @ApiProperty({ minimum: 1, example: ['Cook spaghetti in the boiling water'] })
   instructions!: string[];
@@ -53,7 +51,7 @@ export class RecipeDto {
   tags!: string[];
 
   @ApiProperty({ enum: ['DRAFT', 'FINAL', 'DELETED'] })
-  status!: RecipeStatus;
+  status!: RecipeStatusDto;
 
   @ApiProperty({
     example:
@@ -65,4 +63,19 @@ export class RecipeDto {
     example: 'https://www.allrecipes.com/recipe/222000/spaghetti-aglio-e-olio/',
   })
   originalSource?: string;
+
+  static build(recipe: Recipe): RecipeDto {
+    const instance = new RecipeDto();
+    instance.id = recipe.id;
+    instance.name = recipe.name;
+    instance.description = recipe.description;
+    instance.ingredients = recipe.ingredients?.map(IngredientDto.build);
+    instance.instructions = recipe.instructions;
+    instance.imageUrls = recipe.imageUrls;
+    instance.tags = recipe.tags;
+    instance.status = recipe.status;
+    instance.note = recipe.note;
+    instance.originalSource = recipe.originalSource;
+    return instance;
+  }
 }

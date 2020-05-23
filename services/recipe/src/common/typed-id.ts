@@ -16,6 +16,6 @@
  *
  * p.id = a.id; // TS: Type 'AddressId' is not assignable to type 'PersonId'.
  */
-export interface Id<T> extends Number {
+export interface Id<T> extends String {
   __idTypeFor?: T;
 }

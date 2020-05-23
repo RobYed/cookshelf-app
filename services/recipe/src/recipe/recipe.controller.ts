@@ -12,7 +12,8 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { RecipeDto, RecipeId } from './recipe.dto';
+import { RecipeId } from './recipe.entity';
+import { RecipeDto } from './recipe.dto';
 import { RecipeService } from './recipe.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiOkResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiCreatedResponse, ApiNoContentResponse, ApiConsumes, ApiBody, ApiParam, ApiQuery } from '@nestjs/swagger';
 
@@ -32,7 +33,7 @@ export class RecipeController {
   @ApiOkResponse({ description: 'Recipe successfully updated', type: RecipeDto })
   @ApiBadRequestResponse({ description: 'Invalid recipe or missing id' })
   @ApiNotFoundResponse({ description: 'Recipe not found' })
-  updateRecipe(@Body() recipe: RecipeDto): RecipeDto {
+  updateRecipe(@Body() recipe: RecipeDto): Promise<RecipeDto> {
     return this.recipeService.updateRecipe(recipe);
   }
 
@@ -46,7 +47,7 @@ export class RecipeController {
   @ApiOperation({ summary: 'Add a new recipe to the cookshelf' })
   @ApiCreatedResponse({ description: 'Recipe successfully created', type: RecipeDto })
   @ApiBadRequestResponse({ description: 'Invalid recipe' })
-  createRecipe(@Body() recipe: RecipeDto): RecipeDto {
+  createRecipe(@Body() recipe: RecipeDto): Promise<RecipeDto> {
     return this.recipeService.createRecipe(recipe);
   }
 
@@ -66,7 +67,7 @@ export class RecipeController {
   getRecipes(
     @Query('name') name?: string,
     @Query('tags') tags?: string | string[],
-  ): RecipeDto[] {
+  ): Promise<RecipeDto[]> {
     return this.recipeService.getRecipes(name, this.convertToParamList(tags));
   }
 
@@ -80,7 +81,7 @@ export class RecipeController {
   @ApiParam({ name: 'recipeId', type: Number })
   @ApiOkResponse({ description: 'Recipe found', type: RecipeDto })
   @ApiNotFoundResponse({ description: 'Recipe not found' })
-  getRecipeById(@Param('recipeId') recipeId: RecipeId): RecipeDto | null {
+  getRecipeById(@Param('recipeId') recipeId: RecipeId): Promise<RecipeDto | null> {
     return this.recipeService.getRecipeById(recipeId);
   }
 
@@ -126,7 +127,7 @@ export class RecipeController {
   @Get('tag')
   @ApiOperation({ summary: 'Get a list of all unique tags of existing recipes' })
   @ApiOkResponse({ description: 'Tags found' })
-  getTags(): string[] {
+  getTags(): Promise<string[]> {
     return this.recipeService.getTags();
   }
 

@@ -1,85 +1,95 @@
+import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
-import { RecipeDto, RecipeId } from './recipe.dto';
+import { Recipe, RecipeId } from './recipe.entity';
+import { RecipeDto } from './recipe.dto';
+import { Repository, FindManyOptions, Like, FindConditions, In } from 'typeorm';
 
 @Injectable()
 export class RecipeService {
-  private recipes: Map<RecipeId, RecipeDto> = new Map();
-
-  constructor() {
-    this.recipes.set(1, this.getMockRecipe());
+  constructor(
+    @InjectRepository(Recipe) private recipeRepository: Repository<Recipe>,
+  ) {
+    this.recipeRepository.save(Recipe.build(this.getMockRecipe()));
   }
 
-  get recipeList(): RecipeDto[] {
-    return Array.from(this.recipes.values());
-  }
-
-  updateRecipe(recipe: RecipeDto): RecipeDto {
+  async updateRecipe(recipe: RecipeDto): Promise<RecipeDto> {
     if (!recipe.id) {
       throw new Error('No id supplied');
     }
-    if (!this.recipes.has(recipe.id)) {
+    if (!(await this.exists(recipe.id))) {
       throw new Error('Recipe not found');
     }
-    this.recipes.set(recipe.id, recipe);
-    return recipe;
+    const savedRecipe = await this.recipeRepository.save(Recipe.build(recipe));
+    return RecipeDto.build(savedRecipe);
   }
 
-  createRecipe(recipe: RecipeDto): RecipeDto {
-    const recipeId = this.recipes.size + 1;
-    this.recipes.set(recipeId, { ...recipe, id: recipeId });
-    return recipe;
+  async createRecipe(recipe: RecipeDto): Promise<RecipeDto> {
+    const savedRecipe = await this.recipeRepository.save(Recipe.build(recipe));
+    return RecipeDto.build(savedRecipe);
   }
 
-  getRecipes(name?: string, tags?: string[]): RecipeDto[] {
-    let result = this.recipeList;
+  async getRecipes(name?: string, tags?: string[]): Promise<RecipeDto[]> {
+    let result: Recipe[] | null = null;
     if (name) {
-      result = result.filter(recipe => recipe.name.includes(name));
+      result = await this.recipeRepository.find({ name: Like(name) });
     }
     if (tags) {
-      // filter recipes which contain all tag names
-      result = result.filter(recipe =>
-        tags.every(tag => recipe.tags.includes(tag)),
-      );
+      result = await this.recipeRepository.find({ tags: In(tags) });
     }
-    return result;
+    if (!result) {
+      result = await this.recipeRepository.find();
+    }
+    return result.map(RecipeDto.build);
   }
 
-  getRecipeById(recipeId: RecipeId): RecipeDto | null {
-    return this.recipes.get(recipeId) || null;
+  async getRecipeById(recipeId: RecipeId): Promise<RecipeDto | null> {
+    const result = await this.recipeRepository.findOne(recipeId as string);
+    return result ? RecipeDto.build(result) : null;
   }
 
-  deleteRecipe(recipeId: RecipeId): void {
-    this.recipes.delete(recipeId);
+  async deleteRecipe(recipeId: RecipeId): Promise<void> {
+    await this.recipeRepository.delete(recipeId as string);
+    return Promise.resolve();
   }
 
-  saveImage(recipeId: RecipeId, image: Express.Multer.File): void {
-    if (!this.recipes.has(recipeId)) {
+  async saveImage(
+    recipeId: RecipeId,
+    image: Express.Multer.File,
+  ): Promise<void> {
+    const recipe = await this.recipeRepository.findOne(recipeId as string);
+    if (!recipe) {
       throw new Error(`Recipe with id ${recipeId} does not exist`);
     }
     // TODO: save image in file storage
     const imageUrl = 'some/url/from/storage/';
-    this.recipes.get(recipeId)?.imageUrls.push(imageUrl);
+    recipe.imageUrls.push(imageUrl);
+    return Promise.resolve();
   }
 
-  getTags(): string[] {
-    return this.listOfUniqueValues(
-      this.recipeList.map(recipe => recipe.tags).flat(),
-    );
+  async getTags(): Promise<string[]> {
+    const recipes = await this.recipeRepository.find();
+    return this.listOfUniqueValues(recipes.map(recipe => recipe.tags).flat());
   }
 
   private listOfUniqueValues(array: string[]): string[] {
     return [...new Set(array)];
   }
 
+  private async exists(recipeId: RecipeId): Promise<boolean> {
+    return (
+      (await this.recipeRepository.findOne(recipeId as string)) !== undefined
+    );
+  }
+
   private getMockRecipe(): RecipeDto {
     return {
-      id: 1,
+      id: '1',
       name: 'Spaghetti Aglio e Olio',
       description: 'Fast, healthy and delicious',
       ingredients: [
         {
           amount: 250,
-          unit: { id: 1, name: 'gram' },
+          unit: 'gram',
           name: 'spaghetti',
         },
       ],
