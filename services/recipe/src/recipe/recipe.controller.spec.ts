@@ -166,6 +166,20 @@ describe('Recipe Controller', () => {
     });
   });
 
+  describe('getTags()', () => {
+    it('should call recipe service to return all unique tags', () => {
+      // Arrange
+      const expected = ['Italian', 'Vegetarian', 'Meat'];
+      jest.spyOn(recipeService, 'getTags').mockReturnValue(expected);
+
+      // Act
+      const result = controller.getTags();
+
+      // Assert
+      expect(result).toEqual(expected);
+    });
+  });
+
   function createRecipe(id = 1234): RecipeDto {
     return {
       id,
@@ -173,7 +187,6 @@ describe('Recipe Controller', () => {
       description: 'Fast, healthy and delicious',
       ingredients: [
         {
-          id: 1,
           amount: 1,
           unit: { id: 1, name: 'pound' },
           name: 'spaghetti',
@@ -181,7 +194,7 @@ describe('Recipe Controller', () => {
       ],
       instructions: [],
       imageUrls: [],
-      tags: [{ id: 1, name: 'Italian ' }],
+      tags: ['Italian'],
       note:
         'Add some fresh tomato while cooking to have some light and tasty sauce',
       status: 'DRAFT',

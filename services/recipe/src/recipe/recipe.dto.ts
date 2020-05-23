@@ -3,7 +3,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export type RecipeId = Id<RecipeDto>;
 export type UnitOfMeasurementId = Id<UnitOfMeasurementDto>;
-export type TagId = Id<TagDto>;
 
 export type RecipeStatus = 'DRAFT' | 'FINAL' | 'DELETED';
 
@@ -23,14 +22,6 @@ export class IngredientDto {
   unit!: UnitOfMeasurementDto;
 
   @ApiProperty({ example: 'Spaghetti' })
-  name!: string;
-}
-
-export class TagDto {
-  @ApiProperty({ type: Number })
-  id!: TagId;
-
-  @ApiProperty({ example: 'italian' })
   name!: string;
 }
 
@@ -58,8 +49,8 @@ export class RecipeDto {
   })
   imageUrls!: string[];
 
-  @ApiProperty({ type: [TagDto], example: ['italian', 'vegetarian'] })
-  tags!: TagDto[];
+  @ApiProperty({ example: ['italian', 'vegetarian'] })
+  tags!: string[];
 
   @ApiProperty({ enum: ['DRAFT', 'FINAL', 'DELETED'] })
   status!: RecipeStatus;

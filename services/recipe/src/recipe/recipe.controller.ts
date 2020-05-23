@@ -120,6 +120,16 @@ export class RecipeController {
     this.recipeService.saveImage(recipeId, image);
   }
 
+  /**
+   * Get a list of all unique tags of existing recipes
+   */
+  @Get('tag')
+  @ApiOperation({ summary: 'Get a list of all unique tags of existing recipes' })
+  @ApiOkResponse({ description: 'Tags found' })
+  getTags(): string[] {
+    return this.recipeService.getTags();
+  }
+
   private convertToParamList(param?: string | string[]): string[] {
     if (typeof param === 'string') {
       return param.split(',');

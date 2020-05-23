@@ -9,6 +9,10 @@ export class RecipeService {
     this.recipes.set(1, this.getMockRecipe());
   }
 
+  get recipeList(): RecipeDto[] {
+    return Array.from(this.recipes.values());
+  }
+
   updateRecipe(recipe: RecipeDto): RecipeDto {
     if (!recipe.id) {
       throw new Error('No id supplied');
@@ -27,16 +31,14 @@ export class RecipeService {
   }
 
   getRecipes(name?: string, tags?: string[]): RecipeDto[] {
-    let result = Array.from(this.recipes.values());
+    let result = this.recipeList;
     if (name) {
       result = result.filter(recipe => recipe.name.includes(name));
     }
     if (tags) {
       // filter recipes which contain all tag names
       result = result.filter(recipe =>
-        tags.every(tag =>
-          recipe.tags.map(currTag => currTag.name).includes(tag),
-        ),
+        tags.every(tag => recipe.tags.includes(tag)),
       );
     }
     return result;
@@ -59,6 +61,16 @@ export class RecipeService {
     this.recipes.get(recipeId)?.imageUrls.push(imageUrl);
   }
 
+  getTags(): string[] {
+    return this.listOfUniqueValues(
+      this.recipeList.map(recipe => recipe.tags).flat(),
+    );
+  }
+
+  private listOfUniqueValues(array: string[]): string[] {
+    return [...new Set(array)];
+  }
+
   private getMockRecipe(): RecipeDto {
     return {
       id: 1,
@@ -73,7 +85,7 @@ export class RecipeService {
       ],
       instructions: [],
       imageUrls: ['https://images.unsplash.com/photo-1552056776-9b5657118ca4'],
-      tags: [{ id: 1, name: 'Italian ' }],
+      tags: ['Italian'],
       note:
         'Add some fresh tomato while cooking to have some light and tasty sauce',
       status: 'DRAFT',
