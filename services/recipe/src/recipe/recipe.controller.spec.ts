@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RecipeController } from './recipe.controller';
 import { RecipeService } from './recipe.service';
-import { Recipe } from './recipe.model';
+import { RecipeDto } from './recipe.dto';
 
 describe('Recipe Controller', () => {
   let controller: RecipeController;
@@ -114,7 +114,7 @@ describe('Recipe Controller', () => {
       // Act
       controller.getRecipes(undefined, tagsFilterValue);
 
-      // Asser
+      // Assert
       expect(recipeService.getRecipes).toHaveBeenCalledWith(undefined, [
         'Italian',
         'Vegetarian',
@@ -166,7 +166,7 @@ describe('Recipe Controller', () => {
     });
   });
 
-  function createRecipe(id = 1234): Recipe {
+  function createRecipe(id = 1234): RecipeDto {
     return {
       id,
       name: 'Spaghetti Aglio e Olio',

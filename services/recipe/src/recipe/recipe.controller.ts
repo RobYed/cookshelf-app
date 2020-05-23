@@ -12,9 +12,11 @@ import {
   UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Recipe, RecipeId } from './recipe.model';
+import { RecipeDto, RecipeId } from './recipe.dto';
 import { RecipeService } from './recipe.service';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('recipe')
 @Controller('recipe')
 export class RecipeController {
   constructor(private readonly recipeService: RecipeService) {}
@@ -25,7 +27,7 @@ export class RecipeController {
    * @param recipe Recipe object that needs to be updated
    */
   @Put()
-  updateRecipe(@Body() recipe: Recipe): Recipe {
+  updateRecipe(@Body() recipe: RecipeDto): RecipeDto {
     return this.recipeService.updateRecipe(recipe);
   }
 
@@ -36,7 +38,7 @@ export class RecipeController {
    */
   @Post()
   @HttpCode(201)
-  createRecipe(@Body() recipe: Recipe): Recipe {
+  createRecipe(@Body() recipe: RecipeDto): RecipeDto {
     return this.recipeService.createRecipe(recipe);
   }
 
@@ -50,7 +52,7 @@ export class RecipeController {
   getRecipes(
     @Query('name') name?: string,
     @Query('tags') tags?: string | string[],
-  ): Recipe[] {
+  ): RecipeDto[] {
     return this.recipeService.getRecipes(name, this.convertToParamList(tags));
   }
 
@@ -60,7 +62,7 @@ export class RecipeController {
    * @param recipeId ID of recipe to return
    */
   @Get(':recipeId')
-  getRecipeById(@Param('recipeId') recipeId: RecipeId): Recipe | null {
+  getRecipeById(@Param('recipeId') recipeId: RecipeId): RecipeDto | null {
     return this.recipeService.getRecipeById(recipeId);
   }
 

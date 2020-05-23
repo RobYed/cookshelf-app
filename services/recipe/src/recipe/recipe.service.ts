@@ -1,26 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import { Recipe, RecipeId } from './recipe.model';
+import { RecipeDto, RecipeId } from './recipe.dto';
 
 @Injectable()
 export class RecipeService {
-  private recipes: Map<RecipeId, Recipe> = new Map();
+  private recipes: Map<RecipeId, RecipeDto> = new Map();
 
   constructor() {
     this.recipes.set(1, this.getMockRecipe());
   }
 
-  updateRecipe(recipe: Recipe): Recipe {
+  updateRecipe(recipe: RecipeDto): RecipeDto {
     this.recipes.set(recipe.id, recipe);
     return recipe;
   }
 
-  createRecipe(recipe: Recipe): Recipe {
+  createRecipe(recipe: RecipeDto): RecipeDto {
     const recipeId = this.recipes.size + 1;
     this.recipes.set(recipeId, { ...recipe, id: recipeId });
     return recipe;
   }
 
-  getRecipes(name?: string, tags?: string[]): Recipe[] {
+  getRecipes(name?: string, tags?: string[]): RecipeDto[] {
     let result = Array.from(this.recipes.values());
     if (name) {
       result = result.filter(recipe => recipe.name.includes(name));
@@ -36,7 +36,7 @@ export class RecipeService {
     return result;
   }
 
-  getRecipeById(recipeId: RecipeId): Recipe | null {
+  getRecipeById(recipeId: RecipeId): RecipeDto | null {
     return this.recipes.get(recipeId) || null;
   }
 
@@ -53,7 +53,7 @@ export class RecipeService {
     this.recipes.get(recipeId)?.imageUrls.push(imageUrl);
   }
 
-  private getMockRecipe(): Recipe {
+  private getMockRecipe(): RecipeDto {
     return {
       id: 1,
       name: 'Spaghetti Aglio e Olio',
