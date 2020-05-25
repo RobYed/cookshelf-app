@@ -2,11 +2,13 @@
 
 A recipe storage web app for private usage. The project is primarily meant to be a technology playground.
 
-## ToDos
+## Feature Wish List
 
-- Database & ORM for recipe-service
-- Ionic App
-- Webapp service
-- Authentification
-- Docker & Docker Compose for local dev
-- CI Pipeline
+- [x] Database & ORM for recipe-service
+- [x] Docker & Docker Compose for local dev
+- [ ] Input Validation
+- [ ] Ionic App
+- [ ] ngRx
+- [ ] Webapp service
+- [ ] Authentification
+- [ ] CI Pipeline
