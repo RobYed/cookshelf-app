@@ -28,16 +28,16 @@ export class RecipeService {
     return RecipeDto.build(savedRecipe);
   }
 
-  async getRecipes(name?: string, tags?: string[]): Promise<RecipeDto[]> {
+  async getRecipes(name: string | undefined, tags: string[]): Promise<RecipeDto[]> {
     let result: Recipe[] | null = null;
     if (name) {
       result = await this.recipeRepository.find({ name: Like(name) });
     }
-    if (tags) {
+    if (tags.length > 0) {
       result = await this.recipeRepository.find({ tags: In(tags) });
     }
     if (!result) {
-      result = await this.recipeRepository.find();
+      result = await this.recipeRepository.find() || [];
     }
     return result.map(RecipeDto.build);
   }
@@ -93,7 +93,9 @@ export class RecipeService {
           name: 'spaghetti',
         },
       ],
-      instructions: [],
+      instructions: [
+        'Cook spaghetti in boiling water'
+      ],
       imageUrls: ['https://images.unsplash.com/photo-1552056776-9b5657118ca4'],
       tags: ['Italian'],
       note:
