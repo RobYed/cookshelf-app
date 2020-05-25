@@ -17,7 +17,7 @@ export class IngredientDto {
   static build(ingredient: Ingredient): IngredientDto {
     const instance = new IngredientDto();
     instance.amount = ingredient.amount;
-    instance.unit = ingredient.unit.name;
+    instance.unit = ingredient.unit;
     instance.name = ingredient.name;
     return instance;
   }

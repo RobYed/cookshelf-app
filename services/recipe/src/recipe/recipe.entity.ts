@@ -7,11 +7,9 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
-  ManyToMany,
-  OneToOne,
+  ManyToOne
 } from 'typeorm';
 
-export type UnitOfMeasurementId = Id<UnitOfMeasurement>;
 export type IngredientId = Id<Ingredient>;
 export type RecipeId = Id<Recipe>;
 
@@ -35,6 +33,7 @@ export class Recipe {
   @OneToMany(
     () => Ingredient,
     ingredient => ingredient.recipe,
+    { cascade: true, onDelete: 'CASCADE', eager: true }
   )
   ingredients!: Ingredient[];
 
@@ -78,27 +77,6 @@ export class Recipe {
 }
 
 @Entity()
-export class UnitOfMeasurement {
-  @PrimaryGeneratedColumn('uuid')
-  id!: UnitOfMeasurementId;
-
-  @Column({ nullable: false })
-  name!: string;
-
-  @ManyToMany(
-    () => Ingredient,
-    ingredient => ingredient.unit,
-  )
-  ingredients!: Ingredient[];
-
-  static build(name: string) {
-    const instance = new UnitOfMeasurement();
-    instance.name = name;
-    return instance;
-  }
-}
-
-@Entity()
 export class Ingredient {
   @PrimaryGeneratedColumn('uuid')
   id!: IngredientId;
@@ -106,25 +84,22 @@ export class Ingredient {
   @Column({ nullable: false })
   amount!: number;
 
-  @OneToOne(
-    () => UnitOfMeasurement,
-    uom => uom.ingredients,
-  )
-  unit!: UnitOfMeasurement;
+  @Column()
+  unit!: string;
 
   @Column({ nullable: false })
   name!: string;
 
-  @OneToMany(
+  @ManyToOne(
     () => Recipe,
-    recipe => recipe.ingredients,
+    recipe => recipe.ingredients
   )
   recipe!: Recipe;
 
   static build(ingredient: IngredientDto) {
     const instance = new Ingredient();
     instance.amount = ingredient.amount;
-    instance.unit = UnitOfMeasurement.build(ingredient.unit);
+    instance.unit = ingredient.unit;
     instance.name = ingredient.name;
     return instance;
   }
