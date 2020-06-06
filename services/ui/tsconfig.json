@@ -1,12 +1,8 @@
 {
+  "extends": "../../common/tsconfig.common.json",
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
-    "sourceMap": true,
-    "declaration": false,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
     "module": "esnext",
     "moduleResolution": "node",
     "importHelpers": true,
@@ -14,7 +10,8 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "declaration": false
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

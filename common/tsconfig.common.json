@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "baseUrl": "./",
+      "sourceMap": true,
+      "strict": true,
+      "removeComments": true,
+      "experimentalDecorators": true
+    }
+  }
+  
