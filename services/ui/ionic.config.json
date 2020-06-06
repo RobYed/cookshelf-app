@@ -1,0 +1,7 @@
+{
+  "name": "Cookshelf UI",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
